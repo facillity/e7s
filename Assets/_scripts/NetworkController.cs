@@ -44,7 +44,7 @@ public class NetworkController : NetworkBehaviour {
             Debug.Log("YEABOIIIIII");
             //allVariables.setCurrentScore(5);
             combineBoards();
-           
+            ct = 0;
         }
     }
 
