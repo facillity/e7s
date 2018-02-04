@@ -4,6 +4,26 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
+public class Tuple<T1, T2>
+{
+    public T1 First { get; private set; }
+    public T2 Second { get; private set; }
+    internal Tuple(T1 first, T2 second)
+    {
+        First = first;
+        Second = second;
+    }
+}
+
+public static class Tuple
+{
+    public static Tuple<T1, T2> New<T1, T2>(T1 first, T2 second)
+    {
+        var tuple = new Tuple<T1, T2>(first, second);
+        return tuple;
+    }
+}
+
 public class NetworkController : NetworkBehaviour {
     public Button btn;
     // Use this for initialization
@@ -17,7 +37,7 @@ public class NetworkController : NetworkBehaviour {
     public void CmdDoMe()
     {
         List<int> ns = gameObject.GetComponent<Gameboard>().numset;
-        SendUpdate(allVariables.getPlayerColor(), ns.ToArray());
+        //SendUpdate(allVariables.getPlayerColor(), ns.ToArray());
     }
 
     [SyncVar]
@@ -27,17 +47,17 @@ public class NetworkController : NetworkBehaviour {
 
     void Start () {
         //Button btn = yourButton.GetComponent<Button>();
-        if (NetworkClient.active)
-            EventSendUpdate += SendUpdate;
+        /*if (NetworkClient.active)*/
+        //EventSendUpdate += SendUpdate;
         btn.onClick.AddListener(confirmed);
         //playerColor = allVariables.getPlayerColor();
         //myID = GetComponent<Gameboard>().getID();
     }
 
-    public void SendUpdate(Color color, int[] locs)
+    public void SendUpdate(Tuple<Color, int[]> xxx)
     {
         ct += 1;
-        confirms.Add(color, locs);
+        confirms.Add(xxx.First, xxx.Second);
         Debug.Log("hello");
         if (ct == allVariables.getTotalPlayerCount())
         {
@@ -62,7 +82,11 @@ public class NetworkController : NetworkBehaviour {
     void confirmed ()
     {
         Debug.Log("entered");
-        CmdDoMe();
+        //CmdDoMe();
+        List<int> ns = gameObject.GetComponent<Gameboard>().numset;
+        //SendUpdate(allVariables.getPlayerColor(), ns.ToArray());
+        var p = new Tuple<Color, int[]>(allVariables.getPlayerColor(), ns.ToArray());
+        BroadcastMessage("SendUpdate", p);
         confirms.Clear();
     }
 }
